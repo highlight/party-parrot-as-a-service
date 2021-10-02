@@ -10,6 +10,8 @@ CANNY_THRESH_2 = 200
 MASK_DILATE_ITER = 10
 MASK_ERODE_ITER = 10
 MASK_COLOR = (0.0,0.0,1.0) # In BGR format
+IMAGE_HEIGHT = 100
+IMAGE_WIDTH = 80
 
 def maskForeground(inputPath, outputPath):
 	img = cv2.imread(inputPath)
@@ -55,7 +57,7 @@ def maskForeground(inputPath, outputPath):
 	cv2.imwrite(outputPath, img_a*255)
 
 def cropToFace(inputPath, outputPath):
-	cropper = Cropper(width=80, height=100, face_percent=100)
+	cropper = Cropper(width=IMAGE_WIDTH, height=IMAGE_HEIGHT, face_percent=100)
 
 	# Get a Numpy array of the cropped image
 	cropped_array = cropper.crop(inputPath)
@@ -65,5 +67,25 @@ def cropToFace(inputPath, outputPath):
 		cropped_image = Image.fromarray(cropped_array)
 		cropped_image.save(outputPath)
 
-maskForeground('./assets/sample-photos/john.png', './out/masked.png')
+def addOvalMask(inputPath, outputPath):
+	img = cv2.imread(inputPath)
+	center = (int(IMAGE_WIDTH/2), int(IMAGE_HEIGHT/2))
+	radius = min(center[0], center[1], IMAGE_WIDTH-center[0], IMAGE_HEIGHT-center[1])
+	Y, X = np.ogrid[:IMAGE_HEIGHT, :IMAGE_WIDTH]
+	dist_from_center = np.sqrt((X - center[0])**2 + ((Y/1.3)-center[0])**2)
+
+	mask = dist_from_center <= radius
+
+	masked_img = img.copy()
+	masked_img[~mask] = 0
+
+	tmp = cv2.cvtColor(masked_img, cv2.COLOR_BGR2GRAY)
+	_,alpha = cv2.threshold(tmp,0,255,cv2.THRESH_BINARY)
+	b, g, r = cv2.split(masked_img)
+	rgba = [b,g,r, alpha]
+	dst = cv2.merge(rgba,4)
+	cv2.imwrite(outputPath, dst)
+
+maskForeground('./assets/sample-photos/cameron.png', './out/masked.png')
 cropToFace('./out/masked.png', './out/cropped.png')
+addOvalMask('./out/cropped.png', './out/oval.png')
