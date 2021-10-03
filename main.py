@@ -1,7 +1,9 @@
 from PIL import Image
+import glob
 from autocrop import Cropper
 import numpy as np
 import cv2
+import os
 
 # == Parameters =======================================================================
 BLUR = 21
@@ -10,8 +12,8 @@ CANNY_THRESH_2 = 200
 MASK_DILATE_ITER = 10
 MASK_ERODE_ITER = 10
 MASK_COLOR = (0.0, 0.0, 1.0)  # In BGR format
-IMAGE_HEIGHT = 100
-IMAGE_WIDTH = 80
+IMAGE_HEIGHT = 90
+IMAGE_WIDTH = 70
 
 
 def maskForeground(inputPath, outputPath):
@@ -61,7 +63,7 @@ def maskForeground(inputPath, outputPath):
 
 
 def cropToFace(inputPath, outputPath):
-    cropper = Cropper(width=IMAGE_WIDTH, height=IMAGE_HEIGHT, face_percent=100)
+    cropper = Cropper(width=IMAGE_WIDTH, height=IMAGE_HEIGHT, face_percent=90)
 
     # Get a Numpy array of the cropped image
     cropped_array = cropper.crop(inputPath)
@@ -93,11 +95,60 @@ def addOvalMask(inputPath, outputPath):
     cv2.imwrite(outputPath, dst)
 
 
+def overlay_image_alpha(img, img_overlay, x, y, alpha_mask):
+    """Overlay `img_overlay` onto `img` at (x, y) and blend using `alpha_mask`.
+
+    `alpha_mask` must have same HxW as `img_overlay` and values in range [0, 1].
+    """
+    # Image ranges
+    y1, y2 = max(0, y), min(img.shape[0], y + img_overlay.shape[0])
+    x1, x2 = max(0, x), min(img.shape[1], x + img_overlay.shape[1])
+
+    # Overlay ranges
+    y1o, y2o = max(0, -y), min(img_overlay.shape[0], img.shape[0] - y)
+    x1o, x2o = max(0, -x), min(img_overlay.shape[1], img.shape[1] - x)
+
+    # Exit if nothing to do
+    if y1 >= y2 or x1 >= x2 or y1o >= y2o or x1o >= x2o:
+        return
+
+    # Blend overlay within the determined ranges
+    img_crop = img[y1:y2, x1:x2]
+    img_overlay_crop = img_overlay[y1o:y2o, x1o:x2o]
+    alpha = alpha_mask[y1o:y2o, x1o:x2o, np.newaxis]
+    alpha_inv = 1.0 - alpha
+
+    img_crop[:] = alpha * img_overlay_crop + alpha_inv * img_crop
+
+
 def createFrames(facePath, outputPath):
     FRAME_PATHS = ['./assets/frames/1.png',
-                   './assets/frames/2.png', './assets/frames/3.png']
+                   './assets/frames/2.png', './assets/frames/3.png', './assets/frames/4.png', './assets/frames/5.png', './assets/frames/6.png']
+    FACE_POSITIONS = [(18, 5), (16, 15), (23, 25), (35, 15), (34, 5), (25, 0)]
+    face = np.array(Image.open(facePath))
+
+    for index, framePath in enumerate(FRAME_PATHS):
+        frame = np.array(Image.open(framePath))
+        alpha_mask = face[:, :, 3] / 255.0
+        img_result = frame[:, :, :3].copy()
+        img_overlay = face[:, :, :3]
+
+        x, y = FACE_POSITIONS[index]
+        overlay_image_alpha(img_result, img_overlay, x, y, alpha_mask)
+
+        # Save result
+        Image.fromarray(img_result).save(f"{outputPath}/frame-{index}.png")
 
 
-maskForeground('./assets/sample-photos/jay.png', './out/masked.png')
+def createGif():
+    img, *imgs = [Image.open(f)
+                  for f in sorted(glob.glob('./out/frames/*.png'))]
+    img.save(fp='./out/party-parrot.gif', format='GIF', append_images=imgs,
+             save_all=True, duration=60, loop=0)
+
+
+maskForeground('./assets/sample-photos/john.png', './out/masked.png')
 cropToFace('./out/masked.png', './out/cropped.png')
 addOvalMask('./out/cropped.png', './out/oval.png')
+createFrames('./out/oval.png', './out/frames')
+createGif()

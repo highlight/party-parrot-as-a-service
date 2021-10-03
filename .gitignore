@@ -1,1 +1,3 @@
 out/*.png
+out/*.gif
+out/frames/frame-*.png
