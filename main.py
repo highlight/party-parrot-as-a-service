@@ -3,6 +3,9 @@ import glob
 from autocrop import Cropper
 import numpy as np
 import cv2
+from flask import Flask, request
+import time
+import os
 
 # == Parameters =======================================================================
 BLUR = 21
@@ -146,8 +149,29 @@ def createGif():
              save_all=True, duration=60, loop=0)
 
 
-maskForeground('./assets/sample-photos/john.png', './out/masked.png')
-cropToFace('./out/masked.png', './out/cropped.png')
-addOvalMask('./out/cropped.png', './out/oval.png')
-createFrames('./out/oval.png', './out/frames')
-createGif()
+app = Flask(__name__)
+
+
+@app.route("/")
+def hello_world():
+    return "<p>Hello, World!</p>"
+
+
+@app.route("/party", methods=['POST'])
+def create_party_parrot():
+    image = request.files['image']
+    filename = f"{int(time.time())}.png"
+    image.save(os.path.join(app.root_path, 'out', 'uploads', filename))
+
+    maskForeground(f'./out/uploads/{filename}', './out/masked.png')
+    cropToFace('./out/masked.png', './out/cropped.png')
+    addOvalMask('./out/cropped.png', './out/oval.png')
+    createFrames('./out/oval.png', './out/frames')
+    createGif()
+
+    os.remove(f"./out/uploads/{filename}")
+    return 'Hello!'
+
+
+if __name__ == '__main__':
+    app.run(debug=True, port=os.getenv("PORT", default=5000))
