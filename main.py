@@ -3,7 +3,6 @@ import glob
 from autocrop import Cropper
 import numpy as np
 import cv2
-import os
 
 # == Parameters =======================================================================
 BLUR = 21
