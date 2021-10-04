@@ -4,6 +4,7 @@ WORKDIR /app
 
 ARG SUPABASE_KEY
 ARG SUPABASE_URL
+ARG PORT
 
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update -y
@@ -13,6 +14,6 @@ RUN apt-get install 'ffmpeg'\
     'libxext6'  -y
 RUN pip3 install pipenv
 RUN pipenv sync
-EXPOSE 80
+EXPOSE ${PORT}
 
 CMD ["pipenv run gunicorn main:app"]
