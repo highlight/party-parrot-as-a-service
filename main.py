@@ -79,9 +79,11 @@ def cropToFace(inputPath, outputPath):
     cropped_array = cropper.crop(inputPath)
 
     # Save the cropped image with PIL if a face was detected:
-    if len(cropped_array) > 0:
+    if cropped_array is not None and len(cropped_array) > 0:
         cropped_image = Image.fromarray(cropped_array)
         cropped_image.save(outputPath)
+        return True
+    return False
 
 
 def addOvalMask(inputPath, outputPath):
@@ -165,6 +167,15 @@ def uploadGifToStorage():
     return f'https://gbpohqmsjdcrrrwshczg.supabase.in/storage/v1/object/public/{resp.json()["Key"]}'
 
 
+def resizeImage(inputPath, outputPath):
+    img = cv2.imread(inputPath)
+    dim = (IMAGE_WIDTH, IMAGE_HEIGHT)
+
+    # resize image
+    resized = cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
+    cv2.imwrite(outputPath, resized)
+
+
 app = Flask(__name__)
 
 
@@ -188,7 +199,8 @@ def create_party_parrot():
         image.save(os.path.join(app.root_path, 'out', 'uploads', filename))
 
     maskForeground(f'./out/uploads/{filename}', './out/masked.png')
-    cropToFace('./out/masked.png', './out/cropped.png')
+    if not cropToFace('./out/masked.png', './out/cropped.png'):
+        resizeImage(f'./out/uploads/{filename}', './out/cropped.png')
     addOvalMask('./out/cropped.png', './out/oval.png')
     createFrames('./out/oval.png', './out/frames')
     createGif()
