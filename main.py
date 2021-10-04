@@ -6,7 +6,7 @@ import cv2
 from flask import Flask, request
 import time
 import os
-from supabase_py import create_client, Client,
+from supabase_py import create_client, Client
 from dotenv import load_dotenv
 load_dotenv()
 

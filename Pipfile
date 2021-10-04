@@ -9,6 +9,7 @@ opencv-python = "*"
 flask = "*"
 supabase-py = "*"
 python-dotenv = "*"
+gunicorn = "*"
 
 [dev-packages]
 

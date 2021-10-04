@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "6caacbf872a5ac503d098e2777d3c5121cfcf339f4fac3142cbd425665fa36ce"
+            "sha256": "2b2931a70f8cc5d99f37ad60e97ea56bb4cd25ec0ee40739fd467485d4c96316"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -84,6 +84,14 @@
             ],
             "markers": "python_version >= '3.7'",
             "version": "==0.2.0"
+        },
+        "gunicorn": {
+            "hashes": [
+                "sha256:9dcc4547dbb1cb284accfb15ab5667a0e5d1881cc443e0677b4882a4067a807e",
+                "sha256:e0a968b5ba15f8a328fdfd7ab1fcb5af4470c28aaf7e55df02a99bc13138e6e8"
+            ],
+            "index": "pypi",
+            "version": "==20.1.0"
         },
         "h11": {
             "hashes": [
@@ -325,7 +333,7 @@
                 "sha256:0afc471bf05a56b1569edfa162ca92d5dc40e2638d867840314c012aabc81159",
                 "sha256:44b152532fc6f493fb408e94fb0f808acb3db2a841de1d09c10ba376a8b5ac7f"
             ],
-            "markers": "python_version >= '3.7' and python_version < '4.0'",
+            "markers": "python_version >= '3.7' and python_full_version < '4.0.0'",
             "version": "==0.4.0"
         },
         "py": {
@@ -373,7 +381,7 @@
                 "sha256:0a130662bab7a15f653d4ff969e08368f2f12744669f727c93ffb8a900123196",
                 "sha256:b32ae2c8e2921298391a790c5f02b033c9e9ac6af7e0ab7a050d6e82873a955b"
             ],
-            "markers": "python_version >= '3.7' and python_version < '4.0'",
+            "markers": "python_version >= '3.7' and python_full_version < '4.0.0'",
             "version": "==0.1.2"
         },
         "requests": {
@@ -431,7 +439,7 @@
                 "sha256:4987c65554f7a2dbf30c18fd48778ef124af6fab771a377103da0585e2336ece",
                 "sha256:c4fdf4019605b6e5423637e01bc9fe4daef873709a7973e195ceba0a62bbc844"
             ],
-            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4' and python_version < '4.0'",
+            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4' and python_full_version < '4.0.0'",
             "version": "==1.26.7"
         },
         "websockets": {
