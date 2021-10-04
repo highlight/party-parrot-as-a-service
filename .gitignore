@@ -2,3 +2,4 @@ out/*.png
 out/*.gif
 out/frames/frame-*.png
 out/uploads/*.png
+.env

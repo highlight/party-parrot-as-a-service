@@ -6,6 +6,13 @@ import cv2
 from flask import Flask, request
 import time
 import os
+from supabase_py import create_client, Client,
+from dotenv import load_dotenv
+load_dotenv()
+
+url: str = os.environ.get("SUPABASE_URL")
+key: str = os.environ.get("SUPABASE_KEY")
+supabase: Client = create_client(url, key)
 
 # == Parameters =======================================================================
 BLUR = 21
