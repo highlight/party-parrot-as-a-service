@@ -7,9 +7,9 @@ name = "pypi"
 autocrop = "*"
 opencv-python = "*"
 flask = "*"
-supabase-py = "*"
 python-dotenv = "*"
 gunicorn = "*"
+supabase = "*"
 
 [dev-packages]
 

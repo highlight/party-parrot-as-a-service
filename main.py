@@ -6,7 +6,7 @@ import cv2
 from flask import Flask, request
 import time
 import os
-from supabase_py import create_client, Client
+from supabase import create_client, Client
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -156,6 +156,15 @@ def createGif():
              save_all=True, duration=60, loop=0)
 
 
+def uploadGifToStorage():
+    filename = f"{int(time.time())}.gif"
+    resp = supabase.storage().StorageFileAPI('party-parrots').upload(f'party-parrots/{filename}', './out/party-parrot.gif', {
+	    "content-type": "image/gif"
+    })
+    return f'https://gbpohqmsjdcrrrwshczg.supabase.in/storage/v1/object/public/{resp.json()["Key"]}'
+
+
+
 app = Flask(__name__)
 
 
@@ -175,9 +184,10 @@ def create_party_parrot():
     addOvalMask('./out/cropped.png', './out/oval.png')
     createFrames('./out/oval.png', './out/frames')
     createGif()
+    url = uploadGifToStorage()
 
     os.remove(f"./out/uploads/{filename}")
-    return 'Hello!'
+    return url
 
 
 if __name__ == '__main__':
