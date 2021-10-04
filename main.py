@@ -8,6 +8,7 @@ import time
 import os
 from supabase import create_client, Client
 from dotenv import load_dotenv
+import requests
 load_dotenv()
 
 url: str = os.environ.get("SUPABASE_URL")
@@ -159,10 +160,9 @@ def createGif():
 def uploadGifToStorage():
     filename = f"{int(time.time())}.gif"
     resp = supabase.storage().StorageFileAPI('party-parrots').upload(f'party-parrots/{filename}', './out/party-parrot.gif', {
-	    "content-type": "image/gif"
+        "contentType": "image/gif",
     })
     return f'https://gbpohqmsjdcrrrwshczg.supabase.in/storage/v1/object/public/{resp.json()["Key"]}'
-
 
 
 app = Flask(__name__)
@@ -175,9 +175,17 @@ def hello_world():
 
 @app.route("/party", methods=['POST'])
 def create_party_parrot():
-    image = request.files['image']
     filename = f"{int(time.time())}.png"
-    image.save(os.path.join(app.root_path, 'out', 'uploads', filename))
+    if len(request.files) == 0:
+        imageToDownload = request.form['url']
+        response = requests.get(imageToDownload)
+        file = open(os.path.join(app.root_path,
+                    'out', 'uploads', filename), "wb")
+        file.write(response.content)
+        file.close()
+    else:
+        image = request.files['image']
+        image.save(os.path.join(app.root_path, 'out', 'uploads', filename))
 
     maskForeground(f'./out/uploads/{filename}', './out/masked.png')
     cropToFace('./out/masked.png', './out/cropped.png')
