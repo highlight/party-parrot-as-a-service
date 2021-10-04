@@ -160,7 +160,7 @@ def createGif():
 def uploadGifToStorage():
     filename = f"{int(time.time())}.gif"
     resp = supabase.storage().StorageFileAPI('party-parrots').upload(f'party-parrots/{filename}', './out/party-parrot.gif', {
-        "contentType": "image/gif",
+        "content-type": "image/gif",
     })
     return f'https://gbpohqmsjdcrrrwshczg.supabase.in/storage/v1/object/public/{resp.json()["Key"]}'
 
