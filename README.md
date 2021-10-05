@@ -20,4 +20,4 @@ pipenv run python main.py
 
 ### Assumptions
 
-- The base template for the frames assumes a light-skinned person. Next steps would be to sample the input image for the skin tone then pick a template that matches the tone.
+- The base template for the frames assumes a light-skinned person (see https://github.com/highlight-run/party-parrot-as-a-service/blob/main/assets/frames/1.png). Next steps would be to sample the input image for the skin tone then pick a template that matches the tone.
