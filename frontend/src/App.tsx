@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
+import CountUp from "react-countup";
 import "./App.css";
 import ParrotExample from "./ParrotExample";
 import { supabase } from "./supabaseClient";
 
 function App() {
   const [parrots, setParrots] = useState<string[]>([]);
+  const [numberOfParrotsMade, setNumberOfParrotsMade] = useState(0);
   const [imageUrl, setImageUrl] = useState("");
 
   useEffect(() => {
@@ -17,6 +19,7 @@ function App() {
           .sort(() => 0.5 - Math.random())
           .slice(0, 20)
       );
+      setNumberOfParrotsMade(data?.length || 0);
     };
 
     getParrots();
@@ -24,6 +27,7 @@ function App() {
 
   const onFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setNumberOfParrotsMade((prev) => prev + 1);
     fetch(process.env.REACT_APP_BACKEND_URL || "");
     console.log(imageUrl);
   };
@@ -63,6 +67,10 @@ function App() {
           </form>
         </main>
       </div>
+      <p>
+        <CountUp end={numberOfParrotsMade} duration={1} preserveValue /> party
+        parrots have been created.
+      </p>
     </div>
   );
 }
