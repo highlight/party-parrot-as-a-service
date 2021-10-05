@@ -239,3 +239,20 @@ pre {
 h3 {
   margin-top: 0;
 }
+
+.attribution {
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  position: absolute;
+  bottom: 12px;
+}
+
+.attribution a {
+  height: 1.2em;
+  margin-left: 0.8ch;
+}
+
+.attribution img {
+  height: 100%;
+}

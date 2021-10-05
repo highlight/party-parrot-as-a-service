@@ -7,6 +7,7 @@ import { Tabs, TabList, Tab, TabPanels, TabPanel } from "@reach/tabs";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { shadesOfPurple } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import AnimateHeight from "react-animate-height";
+import Logo from "./logo.svg";
 
 function App() {
   const [parrots, setParrots] = useState<string[]>([]);
@@ -126,6 +127,12 @@ fetch("${process.env.REACT_APP_BACKEND_URL}/party", {
         <CountUp end={numberOfParrotsMade} duration={1} preserveValue />{" "}
         <span className="emphasis">party parrots</span> have been created.
       </p>
+      <div className="glass attribution">
+        A project by{" "}
+        <a href="https://highlight.run">
+          <img src={Logo} alt="Highlight" />
+        </a>
+      </div>
     </div>
   );
 }
