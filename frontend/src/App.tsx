@@ -98,8 +98,8 @@ function App() {
                 >{`const form = new FormData();
 
 form.append(
-	"url",
-	"https://web.com/pic.png"
+  "url",
+  "https://web.com/pic.png"
 );
 
 
