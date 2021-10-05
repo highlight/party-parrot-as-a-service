@@ -3,9 +3,14 @@ import CountUp from "react-countup";
 import "./App.css";
 import ParrotExample from "./ParrotExample";
 import { supabase } from "./supabaseClient";
+import { Tabs, TabList, Tab, TabPanels, TabPanel } from "@reach/tabs";
+import SyntaxHighlighter from "react-syntax-highlighter";
+import { shadesOfPurple } from "react-syntax-highlighter/dist/esm/styles/hljs";
+import AnimateHeight from "react-animate-height";
 
 function App() {
   const [parrots, setParrots] = useState<string[]>([]);
+  const [currentTab, setCurrentTab] = useState(0);
   const [numberOfParrotsMade, setNumberOfParrotsMade] = useState(0);
   const [imageUrl, setImageUrl] = useState("");
 
@@ -32,6 +37,16 @@ function App() {
     console.log(imageUrl);
   };
 
+  const getHeight = () => {
+    console.log(currentTab);
+    switch (currentTab) {
+      case 0:
+        return "500px";
+      case 1:
+        return "550px";
+    }
+  };
+
   return (
     <div className="App">
       <div className="parrotExampleContainer">
@@ -39,35 +54,75 @@ function App() {
           <ParrotExample parrotImageUrl={parrotImageUrl} key={parrotImageUrl} />
         ))}
       </div>
-      <div className="card glass">
+      <AnimateHeight
+        duration={200}
+        height={`${getHeight()}`}
+        className="card glass"
+      >
         <header>
           <h1>Party Parrot as a Service</h1>
+          <p>Your one stop shop for all party parrot needs.</p>
         </header>
         <main>
-          <form onSubmit={onFormSubmit}>
-            {/* <input
+          <Tabs
+            onChange={(i) => {
+              setCurrentTab(i);
+            }}
+          >
+            <TabList>
+              <Tab>API</Tab>
+              <Tab>Web</Tab>
+            </TabList>
+            <TabPanels>
+              <TabPanel>
+                <h3>Send us an image URL</h3>
+
+                <SyntaxHighlighter
+                  language="javascript"
+                  style={shadesOfPurple}
+                >{`const form = new FormData();
+
+form.append(
+	"url",
+	"https://web.com/pic.png"
+);
+
+
+fetch("${process.env.REACT_APP_BACKEND_URL}/party", {
+  "method": "POST",
+  "headers": {
+    "Content-Type": "multipart/form-data;"
+  }
+});`}</SyntaxHighlighter>
+              </TabPanel>
+              <TabPanel>
+                <form onSubmit={onFormSubmit}>
+                  {/* <input
               type="file"
               name="imageUpload"
               accept="image/*"
               aria-label="Upload image file"
             /> */}
-            <input
-              type="text"
-              name="imageURL"
-              aria-label="Image URL"
-              placeholder="Image URL"
-              className="urlInput"
-              value={imageUrl}
-              onChange={(e) => {
-                setImageUrl(e.target.value);
-              }}
-            />
+                  <input
+                    type="text"
+                    name="imageURL"
+                    aria-label="Image URL"
+                    placeholder="Image URL"
+                    className="urlInput"
+                    value={imageUrl}
+                    onChange={(e) => {
+                      setImageUrl(e.target.value);
+                    }}
+                  />
 
-            <button type="submit">PARTY!</button>
-          </form>
+                  <button type="submit">PARTY!</button>
+                </form>
+              </TabPanel>
+            </TabPanels>
+          </Tabs>
         </main>
-      </div>
-      <p>
+      </AnimateHeight>
+      <p className="counter">
         <CountUp end={numberOfParrotsMade} duration={1} preserveValue />{" "}
         <span className="emphasis">party parrots</span> have been created.
       </p>

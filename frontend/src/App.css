@@ -17,21 +17,22 @@
 
 .card {
   padding: 32px;
+  min-width: 518px;
+  transition: all 0.2s ease-in;
 }
 
 .glass {
-  background: rgba(255, 255, 255, 0.19);
+  background: rgb(0 0 0 / 54%);
   border-radius: 16px;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
-  border: 1px solid rgba(255, 255, 255, 0.24);
+  border: 1px solid rgb(103 103 103 / 69%);
 }
 
 form {
   display: flex;
   flex-direction: column;
-  margin-top: 48px;
   row-gap: 32px;
 }
 
@@ -85,7 +86,7 @@ h1 {
   width: 100%;
 }
 
-button {
+form button {
   display: block;
   margin-top: 32px;
   border: none;
@@ -102,8 +103,9 @@ button {
   background: none;
   text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.45);
 }
-button:before,
-button:after {
+
+form button:before,
+form button:after {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -126,16 +128,19 @@ button:after {
     #6fba82
   );
 }
-button:before {
+
+form button:before {
   filter: blur(7px);
   transition: all 0.25s ease;
   -webkit-animation: pulse 10s infinite ease;
   animation: pulse 10s infinite ease;
 }
-button:after {
+
+form button:after {
   filter: blur(0.3px);
 }
-button:hover:before {
+
+form button:hover:before {
   width: 105%;
   height: 105%;
 }
@@ -181,4 +186,56 @@ button:hover:before {
   to {
     background-position: 200% center;
   }
+}
+
+[data-reach-tab-list] {
+  display: flex;
+  margin-top: 24px;
+  justify-content: space-between;
+}
+
+p {
+  margin-top: 0;
+}
+
+header p {
+  margin-top: 8px;
+  color: #ffffffb8;
+}
+
+[data-reach-tab] {
+  display: inline-block;
+  border: none;
+  padding: 0.25em 0.5em;
+  margin: 0;
+  border-bottom: 1px solid #ffffff4f;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  -webkit-appearance: none;
+  font-size: 16px;
+  width: 100%;
+  padding-bottom: 16px;
+}
+
+[data-reach-tab-panel] {
+  padding-top: 32px;
+}
+
+[data-reach-tab][data-selected] {
+  border-bottom-color: white;
+}
+
+.counter {
+  margin-top: 12px;
+}
+
+pre {
+  background: transparent !important;
+  padding: 0px !important;
+}
+
+h3 {
+  margin-top: 0;
 }
