@@ -204,7 +204,8 @@ def create_party_parrot():
     addOvalMask('./out/cropped.png', './out/oval.png')
     createFrames('./out/oval.png', './out/frames')
     createGif()
-    url = uploadGifToStorage()
+#     url = uploadGifToStorage()
+    url = ""
 
     os.remove(f"./out/uploads/{filename}")
     return url
