@@ -150,7 +150,26 @@ fetch("${process.env.REACT_APP_BACKEND_URL}/party", {
                     />
                     <div className="urlContainer">
                       <p>{generatedParrotUrl}</p>
-                      <button className="copyButton">
+                      <button
+                        className="copyButton"
+                        onClick={() => {
+                          if (navigator.clipboard) {
+                            navigator.clipboard
+                              .writeText(generatedParrotUrl)
+                              .then(
+                                () => {
+                                  alert("Party parrot saved to clipboard.");
+                                },
+                                (err) => {
+                                  console.log(
+                                    "Failed to copy the text to clipboard.",
+                                    err
+                                  );
+                                }
+                              );
+                          }
+                        }}
+                      >
                         <svg
                           width="24"
                           height="24"
@@ -190,7 +209,7 @@ fetch("${process.env.REACT_APP_BACKEND_URL}/party", {
         <span className="emphasis">party parrots</span> have been created.
       </p>
       <div className="glass attribution">
-        A project by{" "}
+        By{" "}
         <a href="https://highlight.run">
           <img src={Logo} alt="Highlight" />
         </a>
