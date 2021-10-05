@@ -10,6 +10,8 @@ from supabase import create_client, Client
 from dotenv import load_dotenv
 import requests
 from flask_cors import CORS
+import uuid
+
 load_dotenv()
 
 url: str = os.environ.get("SUPABASE_URL")
@@ -161,7 +163,7 @@ def createGif():
 
 
 def uploadGifToStorage():
-    filename = f"{int(time.time())}.gif"
+    filename = f"{str(uuid.uuid4())}.gif"
     resp = supabase.storage().StorageFileAPI('party-parrots').upload(f'party-parrots/{filename}', './out/party-parrot.gif', {
         "content-type": "image/gif",
     })
@@ -188,7 +190,7 @@ def hello_world():
 
 @app.route("/party", methods=['POST'])
 def create_party_parrot():
-    filename = f"{int(time.time())}.png"
+    filename = f"{str(uuid.uuid4())}.png"
     if len(request.files) == 0:
         imageToDownload = request.form['url']
         response = requests.get(imageToDownload)
@@ -206,8 +208,7 @@ def create_party_parrot():
     addOvalMask('./out/cropped.png', './out/oval.png')
     createFrames('./out/oval.png', './out/frames')
     createGif()
-#     url = uploadGifToStorage()
-    url = ""
+    url = uploadGifToStorage()
 
     os.remove(f"./out/uploads/{filename}")
     return url
