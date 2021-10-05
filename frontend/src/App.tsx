@@ -8,12 +8,15 @@ import SyntaxHighlighter from "react-syntax-highlighter";
 import { shadesOfPurple } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import AnimateHeight from "react-animate-height";
 import Logo from "./logo.svg";
+import HardHadParrot from "./hardhatparrot.gif";
 
 function App() {
   const [parrots, setParrots] = useState<string[]>([]);
   const [currentTab, setCurrentTab] = useState(0);
   const [numberOfParrotsMade, setNumberOfParrotsMade] = useState(0);
   const [imageUrl, setImageUrl] = useState("");
+  const [generatedParrotUrl, setGeneratedParrotUrl] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const getParrots = async () => {
@@ -33,18 +36,33 @@ function App() {
 
   const onFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setNumberOfParrotsMade((prev) => prev + 1);
-    fetch(process.env.REACT_APP_BACKEND_URL || "");
-    console.log(imageUrl);
+    setIsLoading(true);
+    const form = new FormData();
+    form.append("url", imageUrl);
+
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/party` || "", {
+      method: "POST",
+      body: form,
+    }).then((response) => {
+      response.text().then((url) => {
+        setTimeout(() => {
+          setGeneratedParrotUrl(url);
+          setNumberOfParrotsMade((prev) => prev + 1);
+          setIsLoading(false);
+        }, 1000);
+      });
+    });
   };
 
   const getHeight = () => {
-    console.log(currentTab);
     switch (currentTab) {
       case 0:
-        return "500px";
+        return 470;
       case 1:
-        return "550px";
+        if (generatedParrotUrl === "" && !isLoading) {
+          return 325;
+        }
+        return 470;
     }
   };
 
@@ -55,11 +73,7 @@ function App() {
           <ParrotExample parrotImageUrl={parrotImageUrl} key={parrotImageUrl} />
         ))}
       </div>
-      <AnimateHeight
-        duration={200}
-        height={`${getHeight()}`}
-        className="card glass"
-      >
+      <AnimateHeight duration={200} height={getHeight()} className="card glass">
         <header>
           <h1>Party Parrot as a Service</h1>
           <p>Your one stop shop for all party parrot needs.</p>
@@ -116,8 +130,56 @@ fetch("${process.env.REACT_APP_BACKEND_URL}/party", {
                     }}
                   />
 
-                  <button type="submit">PARTY!</button>
+                  <button type="submit" className="button">
+                    PARTY!
+                  </button>
                 </form>
+
+                {isLoading && (
+                  <div className="loadingContainer">
+                    <img src={HardHadParrot} alt="" />
+                    <p>Parrots are hard at work...</p>
+                  </div>
+                )}
+                {generatedParrotUrl !== "" && (
+                  <div className="parrotPreviewContainer">
+                    <img
+                      src={generatedParrotUrl}
+                      alt=""
+                      className="parrotPreview"
+                    />
+                    <div className="urlContainer">
+                      <p>{generatedParrotUrl}</p>
+                      <button className="copyButton">
+                        <svg
+                          width="24"
+                          height="24"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            stroke="currentColor"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="1.5"
+                            d="M6.5 15.25V15.25C5.5335 15.25 4.75 14.4665 4.75 13.5V6.75C4.75 5.64543 5.64543 4.75 6.75 4.75H13.5C14.4665 4.75 15.25 5.5335 15.25 6.5V6.5"
+                          ></path>
+                          <rect
+                            width="10.5"
+                            height="10.5"
+                            x="8.75"
+                            y="8.75"
+                            stroke="currentColor"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="1.5"
+                            rx="2"
+                          ></rect>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                )}
               </TabPanel>
             </TabPanels>
           </Tabs>

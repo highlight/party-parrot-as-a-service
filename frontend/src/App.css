@@ -86,7 +86,7 @@ h1 {
   width: 100%;
 }
 
-form button {
+.button {
   display: block;
   margin-top: 32px;
   border: none;
@@ -104,8 +104,8 @@ form button {
   text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.45);
 }
 
-form button:before,
-form button:after {
+.button:before,
+.button:after {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -129,20 +129,20 @@ form button:after {
   );
 }
 
-form button:before {
+.button:before {
   filter: blur(7px);
   transition: all 0.25s ease;
   -webkit-animation: pulse 10s infinite ease;
   animation: pulse 10s infinite ease;
 }
 
-form button:after {
+.button:after {
   filter: blur(0.3px);
 }
 
-form button:hover:before {
-  width: 105%;
-  height: 105%;
+.button:hover:before {
+  width: 106%;
+  height: 106%;
 }
 
 .urlInput {
@@ -255,4 +255,54 @@ h3 {
 
 .attribution img {
   height: 100%;
+}
+
+.parrotPreview {
+  height: 32px;
+  width: 32px;
+}
+
+.parrotPreviewContainer {
+  padding-top: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.parrotPreviewContainer p {
+  white-space: nowrap;
+  overflow: hidden;
+  margin: 0;
+  text-overflow: ellipsis;
+}
+
+.urlContainer {
+  box-sizing: border-box;
+  width: 518px;
+  margin-top: 12px;
+  background: rgba(0, 0, 0, 0.45);
+  padding: 12px 8px;
+  padding-left: 12px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+}
+
+.copyButton {
+  width: 32px;
+  background-color: transparent;
+  border: none;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  row-gap: 12px;
 }
