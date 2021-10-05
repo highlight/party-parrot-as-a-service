@@ -155,3 +155,30 @@ button:hover:before {
   color: white;
   opacity: 1; /* Firefox */
 }
+
+.emphasis {
+  font-weight: bold;
+  background: linear-gradient(
+    60deg,
+    #fab46e,
+    #f19886,
+    #ff92b1,
+    #cb8ed6,
+    #98b8f8,
+    #3cd6ee,
+    #3aecd5,
+    #a9f1bb
+  );
+  background-size: 200% auto;
+  color: #000;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shine 2s linear infinite;
+}
+
+@keyframes shine {
+  to {
+    background-position: 200% center;
+  }
+}

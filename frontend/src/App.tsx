@@ -68,8 +68,8 @@ function App() {
         </main>
       </div>
       <p>
-        <CountUp end={numberOfParrotsMade} duration={1} preserveValue /> party
-        parrots have been created.
+        <CountUp end={numberOfParrotsMade} duration={1} preserveValue />{" "}
+        <span className="emphasis">party parrots</span> have been created.
       </p>
     </div>
   );
