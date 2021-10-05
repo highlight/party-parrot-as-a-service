@@ -10,13 +10,14 @@ from supabase import create_client, Client
 from dotenv import load_dotenv
 import requests
 from flask_cors import CORS
+from requests_toolbelt.multipart.encoder import MultipartEncoder
 import uuid
 
 load_dotenv()
 
-url: str = os.environ.get("SUPABASE_URL")
-key: str = os.environ.get("SUPABASE_KEY")
-supabase: Client = create_client(url, key)
+SUPABASE_URL: str = os.environ.get("SUPABASE_URL")
+SUPABASE_KEY: str = os.environ.get("SUPABASE_KEY")
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # == Parameters =======================================================================
 BLUR = 21
@@ -163,12 +164,36 @@ def createGif():
 
 
 def uploadGifToStorage():
-    filename = f"{str(uuid.uuid4())}.gif"
-    resp = supabase.storage().StorageFileAPI('party-parrots').upload(f'party-parrots/{filename}', './out/party-parrot.gif', {
-        "content-type": "image/gif",
-    })
-    return f'https://gbpohqmsjdcrrrwshczg.supabase.in/storage/v1/object/public/{resp.json()["Key"]}'
+    filename = f"{str(uuid.uuid4())}.png"
 
+    bucket_name = "party-parrots"
+    base_url = f"{SUPABASE_URL}/storage/v1/object/{bucket_name}/{bucket_name}"
+    request_url = f"{base_url}/{filename}"
+
+    multipart_data = MultipartEncoder(
+        fields={
+            "file": (
+                "party-parrot.gif",
+                open("./out/party-parrot.gif", 'rb'),
+                "image/gif"
+            )
+        })
+
+    formHeaders = {
+        "Content-Type": multipart_data.content_type,
+    }
+
+    headers = dict(supabase._get_auth_headers(), **formHeaders)
+    response = requests.post(
+        url=request_url,
+        headers=headers,
+        data=multipart_data,
+    )
+
+    return f'https://gbpohqmsjdcrrrwshczg.supabase.in/storage/v1/object/public/{response.json()["Key"]}'
+
+def addNewParrotToDatabase(imageUrl):
+	supabase.table('parrots').insert({"url": imageUrl}).execute()
 
 def resizeImage(inputPath, outputPath):
     img = cv2.imread(inputPath)
@@ -183,12 +208,12 @@ app = Flask(__name__)
 CORS(app)
 
 
-@app.route("/")
+@ app.route("/")
 def hello_world():
     return "<p>Hello, World!</p>"
 
 
-@app.route("/party", methods=['POST'])
+@ app.route("/party", methods=['POST'])
 def create_party_parrot():
     filename = f"{str(uuid.uuid4())}.png"
     if len(request.files) == 0:
@@ -209,6 +234,7 @@ def create_party_parrot():
     createFrames('./out/oval.png', './out/frames')
     createGif()
     url = uploadGifToStorage()
+    addNewParrotToDatabase(url)
 
     os.remove(f"./out/uploads/{filename}")
     return url

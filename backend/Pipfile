@@ -12,6 +12,7 @@ gunicorn = "*"
 supabase = "*"
 pillow = "*"
 flask-cors = "*"
+requests-toolbelt = "*"
 
 [dev-packages]
 
