@@ -1,6 +1,6 @@
 FROM jjanzic/docker-python3-opencv:latest
 
-COPY . /app
+COPY backend /app
 WORKDIR /app
 
 ARG SUPABASE_KEY
