@@ -24,6 +24,7 @@ function App() {
 
   const onFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    fetch(process.env.REACT_APP_BACKEND_URL || "");
     console.log(imageUrl);
   };
 

@@ -11,6 +11,7 @@ python-dotenv = "*"
 gunicorn = "*"
 supabase = "*"
 pillow = "*"
+flask-cors = "*"
 
 [dev-packages]
 

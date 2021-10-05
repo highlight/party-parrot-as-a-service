@@ -31,6 +31,7 @@ RUN pip install autocrop
 RUN pip install flask
 RUN pip install python-dotenv
 RUN pip install supabase
+RUN pip install flask-cors
 EXPOSE ${PORT}
 
 CMD ["python3", "main.py"]

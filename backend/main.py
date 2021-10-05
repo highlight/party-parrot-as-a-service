@@ -9,6 +9,7 @@ import os
 from supabase import create_client, Client
 from dotenv import load_dotenv
 import requests
+from flask_cors import CORS
 load_dotenv()
 
 url: str = os.environ.get("SUPABASE_URL")
@@ -177,6 +178,7 @@ def resizeImage(inputPath, outputPath):
 
 
 app = Flask(__name__)
+CORS(app)
 
 
 @app.route("/")
