@@ -119,7 +119,8 @@ fetch("${process.env.REACT_APP_BACKEND_URL}/party", {
               aria-label="Upload image file"
             /> */}
                   <input
-                    type="text"
+                    required
+                    type="url"
                     name="imageURL"
                     aria-label="Image URL"
                     placeholder="Image URL"
