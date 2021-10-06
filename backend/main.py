@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 import requests
 from flask_cors import CORS
 from requests_toolbelt.multipart.encoder import MultipartEncoder
+import validators
 import uuid
 
 load_dotenv()
@@ -192,8 +193,10 @@ def uploadGifToStorage():
 
     return f'https://gbpohqmsjdcrrrwshczg.supabase.in/storage/v1/object/public/{response.json()["Key"]}'
 
+
 def addNewParrotToDatabase(imageUrl):
-	supabase.table('parrots').insert({"url": imageUrl}).execute()
+    supabase.table('parrots').insert({"url": imageUrl}).execute()
+
 
 def resizeImage(inputPath, outputPath):
     img = cv2.imread(inputPath)
@@ -218,6 +221,10 @@ def create_party_parrot():
     filename = f"{str(uuid.uuid4())}.png"
     if len(request.files) == 0:
         imageToDownload = request.form['url']
+
+        if not validators.url(imageToDownload):
+            return ''
+
         response = requests.get(imageToDownload)
         file = open(os.path.join(app.root_path,
                     'out', 'uploads', filename), "wb")

@@ -33,6 +33,7 @@ RUN pip install python-dotenv
 RUN pip install supabase
 RUN pip install flask-cors
 RUN pip install requests_toolbelt
+RUN pip install validators
 
 EXPOSE ${PORT}
 

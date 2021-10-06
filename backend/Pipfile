@@ -13,6 +13,7 @@ supabase = "*"
 pillow = "*"
 flask-cors = "*"
 requests-toolbelt = "*"
+validators = "*"
 
 [dev-packages]
 
