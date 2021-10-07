@@ -180,7 +180,7 @@ fetch("${process.env.REACT_APP_BACKEND_URL}/party", {
                         setImageUrl(e.target.value);
                       }}
                     />
-                    <label htmlFor="imageUpload" className="customFileUpload">
+                    {/* <label htmlFor="imageUpload" className="customFileUpload">
                       <input
                         type="file"
                         id="imageUpload"
@@ -233,7 +233,7 @@ fetch("${process.env.REACT_APP_BACKEND_URL}/party", {
                           </svg>
                         </div>
                       )}
-                    </label>
+                    </label> */}
                   </div>
 
                   <button type="submit" className="button">
