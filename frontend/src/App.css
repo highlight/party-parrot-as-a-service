@@ -151,6 +151,7 @@ h1 {
   padding: 1em;
   border-radius: 12px;
   background: rgb(255 255 255 / 12%);
+  flex-grow: 1;
   border: 1px solid #ffffff8f;
   color: white;
   font-size: 16px;
@@ -323,6 +324,39 @@ h3 {
 
   .App {
     justify-content: unset;
-    padding-top: 10%;
+    padding-top: 5%;
   }
+}
+
+.imageInputContainer {
+  display: flex;
+  column-gap: 24px;
+}
+
+input[type="file"] {
+  display: none;
+}
+
+.customFileUpload {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.imagePreview {
+  height: 32px;
+  width: 32px;
+}
+
+.uploadIcon {
+  height: 24px;
+  width: 24px;
+}
+
+.uploadIconContainer {
+  height: 32px;
+  width: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

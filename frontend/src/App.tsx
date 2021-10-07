@@ -16,6 +16,7 @@ function App() {
   const [currentTab, setCurrentTab] = useState(0);
   const [numberOfParrotsMade, setNumberOfParrotsMade] = useState(0);
   const [imageUrl, setImageUrl] = useState("");
+  const [imageFile, setImageFile] = useState<null | File>(null);
   const [generatedParrotUrl, setGeneratedParrotUrl] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [type, setType] = useState("a");
@@ -41,7 +42,12 @@ function App() {
     setIsLoading(true);
     const form = new FormData();
     form.append("url", imageUrl);
-    form.append("type", type);
+
+    if (imageFile) {
+      form.append("image", imageFile, imageFile.name);
+    } else {
+      form.append("type", type);
+    }
 
     fetch(`${process.env.REACT_APP_BACKEND_URL}/party` || "", {
       method: "POST",
@@ -70,6 +76,11 @@ function App() {
             return 535;
           }
           return 425;
+        }
+        if (isLoading) {
+          if (window.innerWidth < 505) {
+            return 675;
+          }
         }
         if (window.innerWidth < 505) {
           return 665;
@@ -129,12 +140,6 @@ fetch("${process.env.REACT_APP_BACKEND_URL}/party", {
               </TabPanel>
               <TabPanel>
                 <form onSubmit={onFormSubmit}>
-                  {/* <input
-              type="file"
-              name="imageUpload"
-              accept="image/*"
-              aria-label="Upload image file"
-            /> */}
                   <div className="parrotTypeOptionContainer">
                     <ParrotTypeOption
                       value="a"
@@ -161,18 +166,75 @@ fetch("${process.env.REACT_APP_BACKEND_URL}/party", {
                       checked={type === "d"}
                     />
                   </div>
-                  <input
-                    required
-                    type="url"
-                    name="imageURL"
-                    aria-label="Image URL"
-                    placeholder="Image URL"
-                    className="urlInput"
-                    value={imageUrl}
-                    onChange={(e) => {
-                      setImageUrl(e.target.value);
-                    }}
-                  />
+
+                  <div className="imageInputContainer">
+                    <input
+                      required={!imageFile}
+                      type="url"
+                      name="imageURL"
+                      aria-label="Image URL"
+                      placeholder="Image URL"
+                      className="urlInput"
+                      value={imageUrl}
+                      onChange={(e) => {
+                        setImageUrl(e.target.value);
+                      }}
+                    />
+                    <label htmlFor="imageUpload" className="customFileUpload">
+                      <input
+                        type="file"
+                        id="imageUpload"
+                        name="imageUpload"
+                        accept="image/*"
+                        aria-label="Upload image file"
+                        onChange={(e) => {
+                          if (e.target.files && e.target.files[0]) {
+                            setImageFile(e.target.files[0]);
+                          }
+                        }}
+                      />
+                      {imageFile ? (
+                        <img
+                          src={URL.createObjectURL(imageFile)}
+                          alt=""
+                          className="imagePreview"
+                        />
+                      ) : (
+                        <div className="uploadIconContainer">
+                          <svg
+                            width="24"
+                            height="24"
+                            viewBox="4 4 16 16"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="uploadIcon"
+                          >
+                            <path
+                              d="M6.25 14.25C6.25 14.25 4.75 14 4.75 12C4.75 10.2869 6.07542 8.88339 7.75672 8.75897C7.88168 6.5239 9.73368 4.75 12 4.75C14.2663 4.75 16.1183 6.5239 16.2433 8.75897C17.9246 8.88339 19.25 10.2869 19.25 12C19.25 14 17.75 14.25 17.75 14.25"
+                              stroke="currentColor"
+                              stroke-width="1.5"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            ></path>
+                            <path
+                              d="M14.25 15.25L12 12.75L9.75 15.25"
+                              stroke="currentColor"
+                              stroke-width="1.5"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            ></path>
+                            <path
+                              d="M12 19.25V13.75"
+                              stroke="currentColor"
+                              stroke-width="1.5"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            ></path>
+                          </svg>
+                        </div>
+                      )}
+                    </label>
+                  </div>
 
                   <button type="submit" className="button">
                     PARTY!
