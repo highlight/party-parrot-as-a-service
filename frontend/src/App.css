@@ -17,7 +17,7 @@
 
 .card {
   padding: 32px;
-  min-width: 518px;
+  width: 430px;
   transition: all 0.2s ease-in;
   z-index: 5;
 }
@@ -281,7 +281,7 @@ h3 {
 
 .urlContainer {
   box-sizing: border-box;
-  width: 518px;
+  width: 100%;
   margin-top: 12px;
   background: rgba(0, 0, 0, 0.45);
   padding: 12px 8px;
@@ -308,4 +308,9 @@ h3 {
   justify-content: center;
   align-items: center;
   row-gap: 12px;
+}
+
+.parrotTypeOptionContainer {
+  display: flex;
+  justify-content: space-between;
 }

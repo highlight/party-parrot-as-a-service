@@ -9,6 +9,7 @@ import { shadesOfPurple } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import AnimateHeight from "react-animate-height";
 import Logo from "./logo.svg";
 import HardHadParrot from "./hardhatparrot.gif";
+import ParrotTypeOption from "./ParrotTypeOption";
 
 function App() {
   const [parrots, setParrots] = useState<string[]>([]);
@@ -17,6 +18,7 @@ function App() {
   const [imageUrl, setImageUrl] = useState("");
   const [generatedParrotUrl, setGeneratedParrotUrl] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [type, setType] = useState("a");
 
   useEffect(() => {
     const getParrots = async () => {
@@ -39,6 +41,7 @@ function App() {
     setIsLoading(true);
     const form = new FormData();
     form.append("url", imageUrl);
+    form.append("type", type);
 
     fetch(`${process.env.REACT_APP_BACKEND_URL}/party` || "", {
       method: "POST",
@@ -57,12 +60,12 @@ function App() {
   const getHeight = () => {
     switch (currentTab) {
       case 0:
-        return 470;
+        return 570;
       case 1:
         if (generatedParrotUrl === "" && !isLoading) {
-          return 325;
+          return 425;
         }
-        return 470;
+        return 570;
     }
   };
 
@@ -102,6 +105,11 @@ form.append(
   "https://web.com/pic.png"
 );
 
+form.append(
+  "type",
+  "b" // Supported types: 'a', 'b', 'c', 'd'
+);
+
 
 fetch("${process.env.REACT_APP_BACKEND_URL}/party", {
   "method": "POST",
@@ -118,6 +126,32 @@ fetch("${process.env.REACT_APP_BACKEND_URL}/party", {
               accept="image/*"
               aria-label="Upload image file"
             /> */}
+                  <div className="parrotTypeOptionContainer">
+                    <ParrotTypeOption
+                      value="a"
+                      imageUrl="https://gbpohqmsjdcrrrwshczg.supabase.in/storage/v1/object/public/party-parrots/party-parrots/5fcebc0d-7bea-4076-82bf-14d9c9a39088.gif"
+                      onClickHandler={setType}
+                      checked={type === "a"}
+                    />
+                    <ParrotTypeOption
+                      value="b"
+                      imageUrl="https://gbpohqmsjdcrrrwshczg.supabase.in/storage/v1/object/public/party-parrots/party-parrots/5fcccee4-0040-4b2c-a8eb-baa200085f3a.gif"
+                      onClickHandler={setType}
+                      checked={type === "b"}
+                    />
+                    <ParrotTypeOption
+                      value="c"
+                      imageUrl="https://gbpohqmsjdcrrrwshczg.supabase.in/storage/v1/object/public/party-parrots/party-parrots/b898ffaf-73b7-4a6a-9032-a61e25d68720.gif"
+                      onClickHandler={setType}
+                      checked={type === "c"}
+                    />
+                    <ParrotTypeOption
+                      value="d"
+                      imageUrl="https://gbpohqmsjdcrrrwshczg.supabase.in/storage/v1/object/public/party-parrots/party-parrots/131bded5-02b0-4595-89c0-e8bc62ef4226.gif"
+                      onClickHandler={setType}
+                      checked={type === "d"}
+                    />
+                  </div>
                   <input
                     required
                     type="url"

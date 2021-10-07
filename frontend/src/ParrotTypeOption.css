@@ -1,0 +1,34 @@
+.partyTypeOptionImage {
+  height: 32p;
+  width: 32px;
+}
+
+.partyTypeOption {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.partyTypeOptionLabel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  row-gap: 8px;
+}
+
+.partyTypeOption input {
+  opacity: 0;
+  position: absolute;
+}
+
+.partyTypeOption label {
+  padding-bottom: 8px;
+  opacity: 0.6;
+  cursor: pointer;
+}
+
+input[type="radio"]:checked + label {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.603);
+  font-weight: bold;
+  opacity: 1;
+}
