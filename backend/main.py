@@ -138,9 +138,9 @@ def overlay_image_alpha(img, img_overlay, x, y, alpha_mask):
     img_crop[:] = alpha * img_overlay_crop + alpha_inv * img_crop
 
 
-def createFrames(facePath, outputPath):
-    FRAME_PATHS = ['./assets/frames/1.png',
-                   './assets/frames/2.png', './assets/frames/3.png', './assets/frames/4.png', './assets/frames/5.png', './assets/frames/6.png']
+def createFrames(facePath, outputPath, templateType):
+    FRAME_PATHS = [f'./assets/frames/{templateType}/1.png',
+                   f'./assets/frames/{templateType}/2.png', f'./assets/frames/{templateType}/3.png', f'./assets/frames/{templateType}/4.png', f'./assets/frames/{templateType}/5.png', f'./assets/frames/{templateType}/6.png']
     FACE_POSITIONS = [(18, 5), (16, 15), (23, 25), (35, 15), (34, 5), (25, 0)]
     face = np.array(Image.open(facePath))
 
@@ -216,9 +216,17 @@ def hello_world():
     return "<p>Hello, World!</p>"
 
 
+TEMPLATE_TYPES = {'a', 'b'}
+
+
 @ app.route("/party", methods=['POST'])
 def create_party_parrot():
     filename = f"{str(uuid.uuid4())}.png"
+    templateType = 'a'
+
+    if request.form.get('type') and request.form.get('type').lower() in TEMPLATE_TYPES:
+        templateType = request.form.get('type').lower()
+
     if len(request.files) == 0:
         imageToDownload = request.form['url']
 
@@ -238,7 +246,7 @@ def create_party_parrot():
     if not cropToFace('./out/masked.png', './out/cropped.png'):
         resizeImage(f'./out/uploads/{filename}', './out/cropped.png')
     addOvalMask('./out/cropped.png', './out/oval.png')
-    createFrames('./out/oval.png', './out/frames')
+    createFrames('./out/oval.png', './out/frames', templateType)
     createGif()
     url = uploadGifToStorage()
     addNewParrotToDatabase(url)
