@@ -216,7 +216,7 @@ def hello_world():
     return "<p>Hello, World!</p>"
 
 
-TEMPLATE_TYPES = {'a', 'b', 'c'}
+TEMPLATE_TYPES = {'a', 'b', 'c', 'd'}
 
 
 @ app.route("/party", methods=['POST'])
