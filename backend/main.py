@@ -165,7 +165,7 @@ def createGif():
 
 
 def uploadGifToStorage():
-    filename = f"{str(uuid.uuid4())}.png"
+    filename = f"{str(uuid.uuid4())}.gif"
 
     bucket_name = "party-parrots"
     base_url = f"{SUPABASE_URL}/storage/v1/object/{bucket_name}/{bucket_name}"
@@ -221,7 +221,7 @@ TEMPLATE_TYPES = {'a', 'b', 'c', 'd'}
 
 @ app.route("/party", methods=['POST'])
 def create_party_parrot():
-    filename = f"{str(uuid.uuid4())}.png"
+    filename = f"{str(uuid.uuid4())}.gif"
     templateType = 'a'
 
     if request.form.get('type') and request.form.get('type').lower() in TEMPLATE_TYPES:
