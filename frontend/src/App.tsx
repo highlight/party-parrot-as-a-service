@@ -60,10 +60,19 @@ function App() {
   const getHeight = () => {
     switch (currentTab) {
       case 0:
+        if (window.innerWidth < 505) {
+          return 665;
+        }
         return 570;
       case 1:
         if (generatedParrotUrl === "" && !isLoading) {
+          if (window.innerWidth < 505) {
+            return 535;
+          }
           return 425;
+        }
+        if (window.innerWidth < 505) {
+          return 665;
         }
         return 570;
     }

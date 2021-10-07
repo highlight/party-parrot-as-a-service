@@ -314,3 +314,15 @@ h3 {
   display: flex;
   justify-content: space-between;
 }
+
+@media only screen and (max-width: 505px) {
+  .card {
+    width: 90%;
+    box-sizing: border-box;
+  }
+
+  .App {
+    justify-content: unset;
+    padding-top: 10%;
+  }
+}
