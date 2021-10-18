@@ -38,6 +38,10 @@ TTPP is a pretty important metric for our company; it drives many of the core bu
 
 We'll be building a Slack bot that listens to whenever a new person joins our Slack Workspace. After that person joins, we'll send their profile image to Party Parrot as a Service, upload the party parrot as a Slack emoji, then react to the person's joining message with the party parrot.
 
+## Other
+
+This project was made during the Supabase hackathon, and it got 2nd place! https://www.madewithsupabase.com/p/party-parrot-as-a-service
+
 ## Setup
 
 1. Install `pipenv` with `brew install pipenv`
