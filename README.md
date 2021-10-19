@@ -42,6 +42,7 @@ We'll be building a Slack bot that listens to whenever a new person joins our Sl
 
 This project was made during the Supabase hackathon, and it got 2nd place! https://www.madewithsupabase.com/p/party-parrot-as-a-service
 
+
 ## Setup
 
 1. Install `pipenv` with `brew install pipenv`
