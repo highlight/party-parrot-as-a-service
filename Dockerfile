@@ -10,11 +10,11 @@ ARG PORT=5000
 #jpeg support
 RUN apt-get update
 RUN apt-get install libsm6 libxext6 libgl1-mesa-glx -y
-RUN apt-get install libjpeg-dev
+RUN apt-get install libjpeg-dev -y
 #tiff support
-RUN apt-get install libtiff-dev
+RUN apt-get install libtiff-dev -y
 #freetype support
-RUN apt-get install libfreetype6-dev
+RUN apt-get install libfreetype6-dev -y
 #openjpeg200support (needed to compile from source)
 RUN wget http://downloads.sourceforge.net/project/openjpeg.mirror/2.0.1/openjpeg-2.0.1.tar.gz
 RUN tar xzvf openjpeg-2.0.1.tar.gz
