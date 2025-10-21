@@ -22,14 +22,19 @@ const ParrotTypeOption = ({
         id={value}
         name="ParrotTypeOption"
         value={value}
-        aria-label={`Option ${value}`}
+        aria-label={`Select party parrot style ${value.toUpperCase()}`}
         onChange={() => {
           onClickHandler(value);
         }}
         checked={checked}
       />
       <label htmlFor={value} className="partyTypeOptionLabel">
-        <img src={imageUrl} alt="" className="partyTypeOptionImage" />
+        <img
+          src={imageUrl}
+          alt={`Party parrot style ${value.toUpperCase()}`}
+          className="partyTypeOptionImage"
+          loading="lazy"
+        />
         {value.toUpperCase()}
       </label>
     </div>
