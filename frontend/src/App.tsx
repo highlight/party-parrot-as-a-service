@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import CountUp from "react-countup";
 import "./App.css";
 import ParrotExample from "./ParrotExample";
@@ -11,6 +11,16 @@ import Logo from "./logo.svg";
 import HardHadParrot from "./hardhatparrot.gif";
 import ParrotTypeOption from "./ParrotTypeOption";
 
+// Types
+interface ParrotData {
+  url: string;
+}
+
+// Constants
+const DISPLAY_PARROT_COUNT = 20;
+const SUCCESS_DELAY = 1000;
+const MOBILE_BREAKPOINT = 505;
+
 function App() {
   const [parrots, setParrots] = useState<string[]>([]);
   const [currentTab, setCurrentTab] = useState(0);
@@ -20,74 +30,132 @@ function App() {
   const [generatedParrotUrl, setGeneratedParrotUrl] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [type, setType] = useState("a");
+  const [error, setError] = useState<string | null>(null);
+  const [copySuccess, setCopySuccess] = useState(false);
 
   useEffect(() => {
     const getParrots = async () => {
-      const { data } = await supabase.from("parrots").select("url");
-      setParrots(
-        (data || [])
-          .map((row) => row.url)
-          // Get an random subset of 20 party birds.
-          .sort(() => 0.5 - Math.random())
-          .slice(0, 20)
-      );
-      setNumberOfParrotsMade(data?.length || 0);
+      try {
+        const { data, error } = await supabase.from("parrots").select("url");
+
+        if (error) {
+          console.error("Error fetching parrots:", error);
+          setError("Failed to load party parrots. Please try again later.");
+          return;
+        }
+
+        if (data) {
+          const urls = data.map((row: ParrotData) => row.url);
+          // More efficient random selection using Fisher-Yates shuffle
+          const shuffled = [...urls];
+          for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+          }
+          setParrots(shuffled.slice(0, DISPLAY_PARROT_COUNT));
+          setNumberOfParrotsMade(data.length);
+        }
+      } catch (err) {
+        console.error("Unexpected error:", err);
+        setError("An unexpected error occurred. Please try again later.");
+      }
     };
 
     getParrots();
   }, []);
 
-  const onFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const onFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-    const form = new FormData();
-    form.append("url", imageUrl);
+    setError(null);
 
-    if (imageFile) {
-      form.append("image", imageFile, imageFile.name);
-    } else {
-      form.append("type", type);
-    }
+    try {
+      const form = new FormData();
+      form.append("url", imageUrl);
 
-    fetch(`${process.env.REACT_APP_BACKEND_URL}/party` || "", {
-      method: "POST",
-      body: form,
-    }).then((response) => {
-      response.text().then((url) => {
-        setTimeout(() => {
-          setGeneratedParrotUrl(url);
-          setNumberOfParrotsMade((prev) => prev + 1);
-          setIsLoading(false);
-        }, 1000);
+      if (imageFile) {
+        form.append("image", imageFile, imageFile.name);
+      } else {
+        form.append("type", type);
+      }
+
+      const backendUrl = process.env.REACT_APP_BACKEND_URL;
+      if (!backendUrl) {
+        throw new Error("Backend URL is not configured");
+      }
+
+      const response = await fetch(`${backendUrl}/party`, {
+        method: "POST",
+        body: form,
       });
-    });
+
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status} ${response.statusText}`);
+      }
+
+      const url = await response.text();
+
+      // Add a delay for better UX
+      setTimeout(() => {
+        setGeneratedParrotUrl(url);
+        setNumberOfParrotsMade((prev) => prev + 1);
+        setIsLoading(false);
+      }, SUCCESS_DELAY);
+    } catch (err) {
+      console.error("Error creating party parrot:", err);
+      setError(err instanceof Error ? err.message : "Failed to create party parrot. Please try again.");
+      setIsLoading(false);
+    }
   };
 
-  const getHeight = () => {
+  const getHeight = useCallback(() => {
+    const isMobile = window.innerWidth < MOBILE_BREAKPOINT;
+
     switch (currentTab) {
-      case 0:
-        if (window.innerWidth < 505) {
-          return 665;
-        }
-        return 570;
-      case 1:
+      case 0: // API tab
+        return isMobile ? 665 : 570;
+
+      case 1: // Web tab
         if (generatedParrotUrl === "" && !isLoading) {
-          if (window.innerWidth < 505) {
-            return 535;
-          }
-          return 425;
+          return isMobile ? 535 : 425;
         }
         if (isLoading) {
-          if (window.innerWidth < 505) {
-            return 675;
-          }
+          return isMobile ? 675 : 570;
         }
-        if (window.innerWidth < 505) {
-          return 665;
-        }
-        return 570;
+        return isMobile ? 665 : 570;
+
+      default:
+        return isMobile ? 535 : 425;
     }
-  };
+  }, [currentTab, generatedParrotUrl, isLoading]);
+
+  const handleCopyToClipboard = useCallback(async () => {
+    if (!generatedParrotUrl) return;
+
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(generatedParrotUrl);
+      } else {
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = generatedParrotUrl;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        textArea.style.top = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        document.execCommand('copy');
+        textArea.remove();
+      }
+
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy to clipboard:", err);
+      setError("Failed to copy to clipboard. Please copy the URL manually.");
+    }
+  }, [generatedParrotUrl]);
 
   return (
     <div className="App">
@@ -241,6 +309,44 @@ fetch("${process.env.REACT_APP_BACKEND_URL}/party", {
                   </button>
                 </form>
 
+                {error && (
+                  <div className="errorContainer" style={{
+                    padding: '1rem',
+                    marginTop: '1rem',
+                    backgroundColor: '#fee',
+                    border: '1px solid #fcc',
+                    borderRadius: '8px',
+                    color: '#c33'
+                  }}>
+                    <p>{error}</p>
+                    <button
+                      onClick={() => setError(null)}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: '#c33',
+                        cursor: 'pointer',
+                        textDecoration: 'underline'
+                      }}
+                    >
+                      Dismiss
+                    </button>
+                  </div>
+                )}
+
+                {copySuccess && (
+                  <div className="successContainer" style={{
+                    padding: '1rem',
+                    marginTop: '1rem',
+                    backgroundColor: '#efe',
+                    border: '1px solid #cfc',
+                    borderRadius: '8px',
+                    color: '#363'
+                  }}>
+                    <p>Party parrot URL copied to clipboard!</p>
+                  </div>
+                )}
+
                 {isLoading && (
                   <div className="loadingContainer">
                     <img src={HardHadParrot} alt="" />
@@ -258,23 +364,9 @@ fetch("${process.env.REACT_APP_BACKEND_URL}/party", {
                       <p>{generatedParrotUrl}</p>
                       <button
                         className="copyButton"
-                        onClick={() => {
-                          if (navigator.clipboard) {
-                            navigator.clipboard
-                              .writeText(generatedParrotUrl)
-                              .then(
-                                () => {
-                                  alert("Party parrot saved to clipboard.");
-                                },
-                                (err) => {
-                                  console.log(
-                                    "Failed to copy the text to clipboard.",
-                                    err
-                                  );
-                                }
-                              );
-                          }
-                        }}
+                        onClick={handleCopyToClipboard}
+                        title={copySuccess ? "Copied!" : "Copy to clipboard"}
+                        aria-label="Copy party parrot URL to clipboard"
                       >
                         <svg
                           width="24"
