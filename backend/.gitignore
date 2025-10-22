@@ -3,3 +3,5 @@ out/*.gif
 out/frames/frame-*.png
 out/uploads/*.png
 .env
+__pycache__/
+*.pyc

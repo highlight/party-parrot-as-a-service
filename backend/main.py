@@ -3,7 +3,7 @@ import glob
 from autocrop import Cropper
 import numpy as np
 import cv2
-from flask import Flask, request
+from flask import Flask, request, jsonify
 import time
 import os
 from supabase import create_client, Client
@@ -13,12 +13,28 @@ from flask_cors import CORS
 from requests_toolbelt.multipart.encoder import MultipartEncoder
 import validators
 import uuid
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
+from functools import lru_cache
+import hashlib
+import threading
 
 load_dotenv()
 
 SUPABASE_URL: str = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY: str = os.environ.get("SUPABASE_KEY")
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+# Performance optimization configuration
+MAX_WORKERS = int(os.environ.get("MAX_WORKERS", "4"))
+REQUEST_TIMEOUT = int(os.environ.get("REQUEST_TIMEOUT", "30"))
+CACHE_SIZE = int(os.environ.get("CACHE_SIZE", "128"))
+
+# Thread pool for request queuing
+executor = ThreadPoolExecutor(max_workers=MAX_WORKERS)
+processing_semaphore = threading.Semaphore(MAX_WORKERS)
+
+# Cache for generated party parrots
+parrot_cache = {}
 
 # == Parameters =======================================================================
 BLUR = 21
@@ -207,6 +223,69 @@ def resizeImage(inputPath, outputPath):
     cv2.imwrite(outputPath, resized)
 
 
+def get_image_hash(image_path):
+    """Generate a hash for the input image to use as cache key"""
+    with open(image_path, 'rb') as f:
+        return hashlib.sha256(f.read()).hexdigest()
+
+
+def get_cache_key(image_hash, template_type):
+    """Generate cache key from image hash and template type"""
+    return f"{image_hash}_{template_type}"
+
+
+def get_cached_parrot(cache_key):
+    """Retrieve cached parrot URL if available"""
+    if cache_key in parrot_cache:
+        return parrot_cache[cache_key]
+    return None
+
+
+def cache_parrot(cache_key, url):
+    """Cache parrot URL with size limit"""
+    if len(parrot_cache) >= CACHE_SIZE:
+        # Remove oldest entry (simple FIFO)
+        parrot_cache.pop(next(iter(parrot_cache)))
+    parrot_cache[cache_key] = url
+
+
+def process_parrot_request(filename, templateType):
+    """Process party parrot generation request"""
+    try:
+        # Generate cache key
+        image_path = f'./out/uploads/{filename}'
+        image_hash = get_image_hash(image_path)
+        cache_key = get_cache_key(image_hash, templateType)
+        
+        # Check cache first
+        cached_url = get_cached_parrot(cache_key)
+        if cached_url:
+            os.remove(image_path)
+            return cached_url
+        
+        # Process image
+        maskForeground(image_path, './out/masked.png')
+        if not cropToFace('./out/masked.png', './out/cropped.png'):
+            resizeImage(image_path, './out/cropped.png')
+        addOvalMask('./out/cropped.png', './out/oval.png')
+        createFrames('./out/oval.png', './out/frames', templateType)
+        createGif()
+        url = uploadGifToStorage()
+        addNewParrotToDatabase(url)
+        
+        # Cache the result
+        cache_parrot(cache_key, url)
+        
+        # Cleanup
+        os.remove(image_path)
+        return url
+    except Exception as e:
+        # Cleanup on error
+        if os.path.exists(image_path):
+            os.remove(image_path)
+        raise e
+
+
 app = Flask(__name__)
 CORS(app)
 
@@ -214,6 +293,19 @@ CORS(app)
 @ app.route("/")
 def hello_world():
     return "<p>Hello, World!</p>"
+
+
+@ app.route("/health", methods=['GET'])
+def health_check():
+    """Health check endpoint with service metrics"""
+    available_workers = processing_semaphore._value
+    return jsonify({
+        'status': 'healthy',
+        'max_workers': MAX_WORKERS,
+        'available_workers': available_workers,
+        'cache_size': len(parrot_cache),
+        'cache_limit': CACHE_SIZE
+    })
 
 
 TEMPLATE_TYPES = {'a', 'b', 'c', 'd'}
@@ -242,17 +334,23 @@ def create_party_parrot():
         image = request.files['image']
         image.save(os.path.join(app.root_path, 'out', 'uploads', filename))
 
-    maskForeground(f'./out/uploads/{filename}', './out/masked.png')
-    if not cropToFace('./out/masked.png', './out/cropped.png'):
-        resizeImage(f'./out/uploads/{filename}', './out/cropped.png')
-    addOvalMask('./out/cropped.png', './out/oval.png')
-    createFrames('./out/oval.png', './out/frames', templateType)
-    createGif()
-    url = uploadGifToStorage()
-    addNewParrotToDatabase(url)
-
-    os.remove(f"./out/uploads/{filename}")
-    return url
+    # Use semaphore for graceful degradation
+    if not processing_semaphore.acquire(blocking=False):
+        # At capacity - return 503 Service Unavailable
+        os.remove(os.path.join(app.root_path, 'out', 'uploads', filename))
+        return jsonify({'error': 'Service at capacity, please try again later'}), 503
+    
+    try:
+        # Submit to thread pool with timeout
+        future = executor.submit(process_parrot_request, filename, templateType)
+        url = future.result(timeout=REQUEST_TIMEOUT)
+        return url
+    except FuturesTimeoutError:
+        return jsonify({'error': 'Request timeout'}), 504
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        processing_semaphore.release()
 
 
 if __name__ == '__main__':
