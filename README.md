@@ -1,6 +1,8 @@
 ## Demo
 
-https://party.highlight.run
+🎉 **Live Demo:** https://party.highlight.run
+
+Try it out and create your own party parrot!
 
 ## Team
 
@@ -44,8 +46,9 @@ This project was made during the Supabase hackathon, and it got 2nd place! https
 
 ## Setup
 
-1. Install `pipenv` with `brew install pipenv`
-
+1. Install `pipenv` with `brew install pipenv` (macOS) or `pip install pipenv` (other platforms)
+2. Clone this repository: `git clone https://github.com/highlight/party-parrot-as-a-service.git`
+3. Navigate to the project directory: `cd party-parrot-as-a-service`
 
 ## Installing Dependencies
 
@@ -53,10 +56,16 @@ This project was made during the Supabase hackathon, and it got 2nd place! https
 pipenv install
 ```
 
-## Running
+## Running the Application
 
 ```sh
 pipenv shell
 pipenv run python main.py
 ```
+
+The application will start and be available at the configured port.
+
+## API Usage
+
+Once running, you can use the API to generate party parrots by sending images to the service endpoints. Check the backend documentation for specific API endpoints and usage examples.
 
